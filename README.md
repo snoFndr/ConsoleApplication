@@ -1,6 +1,6 @@
 # Console Application Used To Test Something
-It's my test Console Application that I'm using to test something'
-'.NET Core 3.0'
+It's my test Console Application that I'm using to test something
+.NET Core 3.0
 
  1. CheckFileInUse: Check if a file is in use from another process.
  2. Fibonacci test.
