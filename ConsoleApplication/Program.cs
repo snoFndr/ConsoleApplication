@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Configuration;
+using System.Data;
+using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -144,41 +146,41 @@ namespace ConsoleApplication
 
 		private static void TrySqlDataReader()
 		{
-			//try
-			//{
-			//	var conn = new SqlConnection(@"server=DB05\BE;database=EBO;Connection Timeout=200;uid=d3cmsadm;pwd=d3cmsadm");
-			//	using (var comm = new SqlCommand("wNews_RequestBitlyGet", conn))
-			//	{
-			//		conn.Open();
-			//		comm.CommandType = CommandType.StoredProcedure;
-			//		using (SqlDataReader dr = comm.ExecuteReader())
-			//		{
-			//			while (dr.Read())
-			//			{
-			//				var reqId = int.Parse(dr["Id"].ToString());
-			//				var wNewsId = int.Parse(dr["wNewsId"].ToString());
-			//				//string wNewsUrl = retrieveFullUrl(dr["Url"].ToString(), int.Parse(dr["SiteId"].ToString()), dr["Lang"].ToString());
-			//				var wNewsLang = dr["Lang"].ToString();
-			//				var siteId = int.Parse(dr["SiteId"].ToString());
-			//				//string shortUrl = shortUrlGet(wNewsUrl);
-			//				//if (!shortUrl.Equals(String.Empty))
-			//				//{
-			//				//	if (urlDataSet(wNewsId, wNewsLang, shortUrl))
-			//				//		requestStatusSet(reqId, 1);
-			//				//	else
-			//				//		// Saving data error case
-			//				//		requestStatusSet(reqId, 2);
-			//				//}
-			//				//System.Threading.Thread.Sleep(3000);
-			//			}
-			//		}
-			//		conn.Close();
-			//	}
-			//}
-			//catch (Exception exception)
-			//{
-			//	Console.WriteLine(exception.Message);
-			//}
+			try
+			{
+				var conn = new SqlConnection(@"server=DB05\BE;database=EBO;Connection Timeout=200;uid=d3cmsadm;pwd=d3cmsadm");
+				using (var comm = new SqlCommand("wNews_RequestBitlyGet", conn))
+				{
+					conn.Open();
+					comm.CommandType = CommandType.StoredProcedure;
+					using (SqlDataReader dr = comm.ExecuteReader())
+					{
+						while (dr.Read())
+						{
+							var reqId = int.Parse(dr["Id"].ToString());
+							var wNewsId = int.Parse(dr["wNewsId"].ToString());
+							//string wNewsUrl = retrieveFullUrl(dr["Url"].ToString(), int.Parse(dr["SiteId"].ToString()), dr["Lang"].ToString());
+							var wNewsLang = dr["Lang"].ToString();
+							var siteId = int.Parse(dr["SiteId"].ToString());
+							//string shortUrl = shortUrlGet(wNewsUrl);
+							//if (!shortUrl.Equals(String.Empty))
+							//{
+							//	if (urlDataSet(wNewsId, wNewsLang, shortUrl))
+							//		requestStatusSet(reqId, 1);
+							//	else
+							//		// Saving data error case
+							//		requestStatusSet(reqId, 2);
+							//}
+							//System.Threading.Thread.Sleep(3000);
+						}
+					}
+					conn.Close();
+				}
+			}
+			catch (Exception exception)
+			{
+				Console.WriteLine(exception.Message);
+			}
 
 		}
 
