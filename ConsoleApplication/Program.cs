@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.ObjectModel;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
@@ -76,6 +77,9 @@ namespace ConsoleApplication
 							break;
 						case 15:
 							GetListOfAirlines();
+							break;
+						case 16:
+							GetTimeZoneDetails();
 							break;
 						case 99:
 							Environment.Exit(0);
@@ -269,6 +273,34 @@ namespace ConsoleApplication
 		}
 
 		#endregion
+
+		public static void GetTimeZoneDetails()
+		{
+			var timeZoneId = 145; //Istanbul - Turkey
+
+			//var test = new TimeZoneNames.TimeZoneValues();
+			//var timeZones = TimeZoneComponents.GetTimezones();
+
+			//foreach (var timezone in timeZones)
+			//{
+			//	var intervals = TimeZoneComponents.GetTimeZoneIntervals(timezone.Id);
+			//	string intervalsText = String.Empty;
+
+			//	if (intervals.Count() == 0)
+			//		Console.WriteLine(timezone.Id.ToString().PadRight(40) + ", " + timezone.Name.PadRight(50) + ", Not Found");
+
+			//	foreach (var interval in intervals)
+			//	{
+			//		Console.WriteLine(timezone.Id.ToString().PadRight(40) + ", " + timezone.Name.PadRight(50) + ", " +
+			//		                  interval.Name);
+			//	}
+			//}
+
+			ReadOnlyCollection<TimeZoneInfo> tzCollection;
+			tzCollection = TimeZoneInfo.GetSystemTimeZones();
+			foreach (TimeZoneInfo timeZone in tzCollection)
+				Console.WriteLine("   {0}: {1}", timeZone.Id, timeZone.DisplayName);
+		}
 
 		public static void GetListOfAirlines()
 		{
