@@ -10,6 +10,7 @@ using System.Xml;
 using ConsoleApplication.Components;
 using ConsoleApplication.Services;
 using Newtonsoft.Json;
+using TimeZoneConverter;
 using Tweetinvi;
 using Tweetinvi.Parameters;
 
@@ -277,6 +278,24 @@ namespace ConsoleApplication
 		public static void GetTimeZoneDetails()
 		{
 			var timeZoneId = 145; //Istanbul - Turkey
+
+			
+
+			//foreach (TimeZoneInfo z in TimeZoneInfo.GetSystemTimeZones())
+			//{
+			//	Console.WriteLine(z.Id);
+			//	//Console.WriteLine(z.);
+			//}
+
+			var timeInfo = TimeZoneInfo.FindSystemTimeZoneById("130");
+
+			//var matchTimeZone = timezones.Single(s => s.xgeoVenueId == possibleMatch.VenueId);
+
+			
+
+			//var date = TimeZoneInfo.ConvertTimeFromUtc(currentTime, timeInfo);
+
+			var dsa = TZConvert.GetTimeZoneInfo("145");
 
 			//var test = new TimeZoneNames.TimeZoneValues();
 			//var timeZones = TimeZoneComponents.GetTimezones();
