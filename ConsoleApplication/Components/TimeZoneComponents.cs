@@ -25,11 +25,11 @@ namespace ConsoleApplication.Components
 			{
 				var tz = TimeZoneInfo.FindSystemTimeZoneById(timezoneId);
 				var tzdbSource = TzdbDateTimeZoneSource.Default;
-				var tzid = tzdbSource.MapTimeZoneId(tz);
+				//var tzid = tzdbSource.MapTimeZoneId(tz);
 
-				if (String.IsNullOrEmpty(tzid)) return new List<ZoneInterval>();
+				//if (String.IsNullOrEmpty(tzid)) return new List<ZoneInterval>();
 
-				dateTimeZone = DateTimeZoneProviders.Tzdb[tzid];
+				//dateTimeZone = DateTimeZoneProviders.Tzdb[tzid];
 
 				var yearStart = Instant.FromDateTimeUtc(DateTime.SpecifyKind(DateTime.Parse("1/1/2018"), DateTimeKind.Utc));
 				var yearEnd = Instant.FromDateTimeUtc(DateTime.SpecifyKind(DateTime.Parse("1/1/2019"), DateTimeKind.Utc));

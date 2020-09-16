@@ -82,6 +82,9 @@ namespace ConsoleApplication
 						case 16:
 							GetTimeZoneDetails();
 							break;
+						case 17:
+							GetOrganizations();
+							break;
 						case 99:
 							Environment.Exit(0);
 							break;
@@ -139,6 +142,8 @@ namespace ConsoleApplication
 			Console.WriteLine(" 13. Datetime in ISO8601 format.");
 			Console.WriteLine(" 14. Object to replace.");
 			Console.WriteLine(" 15. FlightStats APIs.");
+			Console.WriteLine(" 16. Time Zone details.");
+			Console.WriteLine(" 17. OICD - Get Organization for User.");
 			Console.WriteLine(" ");
 			// more here
 			Console.WriteLine(" 99. Exit program");
@@ -319,6 +324,24 @@ namespace ConsoleApplication
 			tzCollection = TimeZoneInfo.GetSystemTimeZones();
 			foreach (TimeZoneInfo timeZone in tzCollection)
 				Console.WriteLine("   {0}: {1}", timeZone.Id, timeZone.DisplayName);
+		}
+
+		public static void GetOrganizations()
+		{
+			var organizationComponent = new OrganizationComponent();
+			var userOrganizationsWithoutEvent =  organizationComponent.GetUserOrganizationsWithoutEvent();
+			var ddd = userOrganizationsWithoutEvent.Where(u=> string.IsNullOrWhiteSpace(u.EventId)).Select(u => u.OrganizationId).ToList();
+
+
+			var userOrganizationsEvent = organizationComponent.GetUserOrganizationsEvent();
+			var sss = userOrganizationsEvent.Where(u => u.EventId == "EVN-AAAAAAAA-AAAA-AAAA-AAAA-000000000001").Select(u => u.OrganizationId).ToList();
+
+			ddd.AddRange(sss);
+			var result = ddd.Distinct().ToList();
+
+			var tttt = string.Join(",", result);
+
+			Console.WriteLine("");
 		}
 
 		public static void GetListOfAirlines()
