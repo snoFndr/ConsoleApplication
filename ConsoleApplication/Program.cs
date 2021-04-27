@@ -9,6 +9,7 @@ using System.Text;
 using System.Xml;
 using ConsoleApplication.Components;
 using ConsoleApplication.Services;
+using LiveBlogging;
 using Newtonsoft.Json;
 using TimeZoneConverter;
 using Tweetinvi;
@@ -85,6 +86,9 @@ namespace ConsoleApplication
 						case 17:
 							GetOrganizations();
 							break;
+						case 18:
+							GetLiveBloggingBlog();
+							break;
 						case 99:
 							Environment.Exit(0);
 							break;
@@ -144,6 +148,7 @@ namespace ConsoleApplication
 			Console.WriteLine(" 15. FlightStats APIs.");
 			Console.WriteLine(" 16. Time Zone details.");
 			Console.WriteLine(" 17. OICD - Get Organization for User.");
+			Console.WriteLine(" 18. LiveBlogging - Get Blog.");
 			Console.WriteLine(" ");
 			// more here
 			Console.WriteLine(" 99. Exit program");
@@ -324,6 +329,13 @@ namespace ConsoleApplication
 			tzCollection = TimeZoneInfo.GetSystemTimeZones();
 			foreach (TimeZoneInfo timeZone in tzCollection)
 				Console.WriteLine("   {0}: {1}", timeZone.Id, timeZone.DisplayName);
+		}
+
+		public static void GetLiveBloggingBlog()
+		{
+			var lb = new LiveBloggingManagementProxyService();
+			lb.GetBlogs();
+			lb.GetRestBlog();
 		}
 
 		public static void GetOrganizations()

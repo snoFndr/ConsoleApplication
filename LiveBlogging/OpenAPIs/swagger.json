@@ -1,0 +1,1379 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "Management API",
+    "version": "v1"
+  },
+  "paths": {
+    "/api/management/v1/Blogs": {
+      "get": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Get list of latest 100 blogs.",
+        "description": "Call this endpoint to get a list containing the latest 100 blog.\r\nAn optional parameter Language can filter the list of blog returning the latest 100 blogs of the specified language.\r\nAn optional parameter tags.slug can filter the list of blog returning the latest 100 blogs containing the specified slug.\r\nThe language should be expressed in ISO code representing both language and country (e.g. it-IT, en-US, en-GB, fr-FR, etc.)",
+        "parameters": [
+          {
+            "name": "language",
+            "in": "query",
+            "description": "Language parameter (example correct: en-US).",
+            "schema": {
+              "type": "string",
+              "description": "Language parameter (example correct: en-US).",
+              "nullable": true
+            }
+          },
+          {
+            "name": "tags.slug",
+            "in": "query",
+            "description": "The slug of a tag used to filter blogs, can be repeated (E.G : tags.slug=slug-1 || tags.slug=slug-1,slug-2)",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              },
+              "description": "The slug of a tag used to filter blogs, can be repeated (E.G : tags.slug=slug-1 || tags.slug=slug-1,slug-2)",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of blogs matching the language query parameter",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "When language parameter is invalid"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Creates a new Blog.",
+        "description": "Use this endpoint to create a new blog.\r\nUse parameters to define the Title of the blog, an identifier called Slug, the language of the blog and\r\na period of time identified by optional DateFrom and DateTo fields.\r\nTags can be either an array of tag objects, an empty array or null\r\nThe language should be expressed in ISO code representing both language and country (e.g. it-IT, en-US, en-GB, fr-FR, etc.)\r\nDateFrom and DateTo should be expressed in ISO8601 format (e.g. 2018-01-05T11:20:00.098Z, 2018-01-05 etc.)\r\nand DateFrom has to be previous than DateTo. You can specify either both or none of them (in this case dates are initialized\r\nwith the value: 0001-01-01T00:00:00).\r\nTimezone should be aligned with UTC standard time offsets (from UTC-12:00 to UTC+14:00).\r\nIf the nation to refer adopts the Daylight Saving Time (DST), specify it appending DST to the offset.\r\nExample: if the blog refers to New York timezone (that adopts DST), the value will be UTC-05:00DST.\r\nIf its value is null, it will be set to UTC+00:00DST as default.\r\nAuthor field should contain the full name of an author.\r\nAuthor must be a user who logged in the backoffice at least once.\r\nWhen a Blog is created the location of the created resource is returned in the Response headers.\r\nPresentation is an object containing some props telling the LIVE BLOGGING widget what should or should not render\r\nkeyMomentsVisible sets the visibility of the key moments timeline\r\nshowBlogDefinition sets the LIVE BLOGGING widget visibility of the LIVE BLOGGING widget header / blog definition\r\npaginationType (Either InfiniteScroll or LoadMore) sets the LIVE BLOGGING widget pagination type",
+        "requestBody": {
+          "description": "The blog data.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created when the blog has been created"
+          },
+          "400": {
+            "description": "When the parameter does not pass additional validation, e.g. invalid language, duplicate slug for the same language or not existing author."
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same blog"
+          },
+          "422": {
+            "description": "When the parameter does not match its model"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Blogs/{id}": {
+      "put": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Updates a Blog.",
+        "description": "Use this endpoint to update a  blog.\r\nUse parameters to define the Title of the blog, an identifier called Slug, the language of the blog and\r\na period of time identified by optional DateFrom and DateTo fields.\r\nTags can be either an array of tag objects, an empty array or null\r\nThe language should be expressed in ISO code representing both language and country (e.g. it-IT, en-US, en-GB, fr-FR, etc.)\r\nDateFrom and DateTo should be expressed in ISO8601 format (e.g. 2018-01-05T11:20:00.098Z, 2018-01-05 etc.)\r\nand DateFrom has to be previous than DateTo. You can specify either both or none of them (in this case dates are initialized\r\nwith the value: 0001-01-01T00:00:00).\r\nTimezone should be aligned with UTC standard time offsets (from UTC-12:00 to UTC+14:00).\r\nIf the nation to refer adopts the Daylight Saving Time (DST), specify it appending DST to the offset.\r\nExample: if the blog refers to New York timezone (that adopts DST), the value will be UTC-05:00DST.\r\nIf its value is null, it will be set to UTC+00:00DST as default.\r\nAuthor field should contain the full name of an author.\r\nAuthor must be a user who logged in the backoffice at least once. The author will be set as last contributor of the blog.\r\nPresentation is an object containing some props telling the LIVE BLOGGING widget what should or should not render\r\nkeyMomentsVisible sets the visibility of the key moments timeline\r\nshowBlogDefinition sets the LIVE BLOGGING widget visibility of the LIVE BLOGGING widget header / blog definition\r\npaginationType (Either InfiniteScroll or LoadMore) sets the LIVE BLOGGING widget pagination type",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the blog to update",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The id of the blog to update",
+              "nullable": true
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The blog data.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateBlog"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "No content when the blog has been updated"
+          },
+          "400": {
+            "description": "When the parameter does not pass additional validation, e.g. invalid language, duplicate slug for the same language or not existing author."
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same blog"
+          },
+          "422": {
+            "description": "When the parameter does not match its model"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Archives a blog",
+        "description": "Use this endpoint to archive an existing blog.\r\nYou have to pass the Id of the existing blog to archive it; you cannot archive an already archived blog.\r\nIf the blog is already archived or does not exist the response will have 404 status code.\r\nWhen you'll get all blogs with the correct API you will not see the archived blogs.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The Id of the blog to archive",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The Id of the blog to archive",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "When the parameter does not match its model"
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same blog"
+          },
+          "404": {
+            "description": "When the requested blog could not be found"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Blogs/{blogId}": {
+      "get": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Get a blog by id.",
+        "description": "Call this endpoint to get a blog whose id matches the provided id.\r\nIf there is a match, it returns the found blog.\r\nIf there is no match, return not found response code.",
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "The id of the blog to get",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The id of the blog to get",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blog matching the given id",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Blog"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "When the requested blog could not be found"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Blogs/{blogId}/Posts": {
+      "get": {
+        "tags": [
+          "Blogs"
+        ],
+        "summary": "Get a blog ordered posts given the corresponding Id.",
+        "description": "Use this endpoint to get a list of posts of the specified blog Id.\r\nIf the blog does not exist return 404.",
+        "parameters": [
+          {
+            "name": "blogId",
+            "in": "path",
+            "description": "The Id of the blog to get its posts",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The Id of the blog to get its posts",
+              "nullable": true
+            }
+          },
+          {
+            "name": "externalSourceReference",
+            "in": "query",
+            "description": "Filter blog posts by external source reference (sourceType):(id) (e.g. media:1e2c37a4-14c8-413b-a0ef-073c6796af1a)",
+            "schema": {
+              "type": "string",
+              "description": "Filter blog posts by external source reference (sourceType):(id) (e.g. media:1e2c37a4-14c8-413b-a0ef-073c6796af1a)",
+              "nullable": true
+            }
+          },
+          {
+            "name": "$skip",
+            "in": "query",
+            "description": "The number of posts to skip before the first returned.",
+            "schema": {
+              "type": "string",
+              "description": "The number of posts to skip before the first returned.",
+              "nullable": true
+            }
+          },
+          {
+            "name": "$limit",
+            "in": "query",
+            "description": "The number of posts to be returned.",
+            "schema": {
+              "type": "string",
+              "description": "The number of posts to be returned.",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the list of ordered posts (no more than 100).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PostManagement"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Blog does not exist."
+          }
+        }
+      }
+    },
+    "/api/management/v1/Configurations": {
+      "put": {
+        "tags": [
+          "Configurations"
+        ],
+        "summary": "Updates an application configuration.",
+        "description": "Use this endpoint to create or update an application configuration.\r\nNeeded properties are Key and Values.\r\nKey is the identifier of the configuration to create or update. Keys are case insensitive.\r\nThe available `Key` values for the configuration are:\r\n    `cloudinary`,\r\n    `data_sources`,\r\n    `external_post_parts`,\r\n    `digital_asset_management`,\r\n    `media_manager`,\r\n    `photo_formats`,\r\n    `video_formats`,\r\n    `system_languages`,\r\n    `external_tag_providers`,\r\n    `parts_properties`,\r\n    `icons_presets`,\r\n    `sponsors`,\r\n    `flags_crests_presets`,\r\n    `post_share_destinations`.\r\n            \r\nValues accepts the documented required data for each configuration.\r\nPlease refer to the documentation portal to know how to fill this field properly.\r\nThe requested Values is validated via Json Schema. If the configuration does not exist, it will be created.",
+        "requestBody": {
+          "description": "The Key and the Values of the configuration to update.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            },
+            "text/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            },
+            "application/*+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfigurationManagement"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "The configuration has been updated"
+          },
+          "422": {
+            "description": "When the configuration does not match its json schema or the given key is invalid or missing (check the available keys in description)"
+          },
+          "500": {
+            "description": "Configuration update request failed"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Configurations/{key}": {
+      "delete": {
+        "tags": [
+          "Configurations"
+        ],
+        "summary": "Deletes an application configuration.",
+        "description": "Use this endpoint to delete an application configuration.\r\nKey is the identifier of the configuration to delete. Keys are case insensitive.\r\nThe available `Key` values for the configuration are:\r\n    `cloudinary`,\r\n    `data_sources`,\r\n    `external_post_parts`,\r\n    `digital_asset_management`,\r\n    `media_manager`,\r\n    `photo_formats`,\r\n    `video_formats`,\r\n    `system_languages`,\r\n    `external_tag_providers`,\r\n    `parts_properties`,\r\n    `icons_presets`,\r\n    `sponsors`,\r\n    `flags_crests_presets`,\r\n    `post_share_destinations`.",
+        "parameters": [
+          {
+            "name": "key",
+            "in": "path",
+            "description": "The Key to be removed.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The Key to be removed.",
+              "format": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "The configuration has been deleted"
+          },
+          "500": {
+            "description": "Configuration deletion request failed"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Media": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Upload a media on your DAM system.",
+        "description": "Use these parameters to upload a media on your DAM system:\r\nPublicUrl: the public url of the media to upload\r\nAuthor: should contain the full name of an author and must be a user who logged in the backoffice at least once.\r\nBlogId: the id of the related blog,\r\nName: the name of the media that BackOffice will use\r\nTimeStamp: (optional) should be expressed in ISO8601 format (e.g. 2018-01-05T11:20:00.098Z, 2018-01-05 etc.)\r\nFileName: an optional filename used in cloudinary as publicId. Only digits, lowercase chars, dash and underscore are allowed.",
+        "requestBody": {
+          "description": "The media data.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "text/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/*+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "No content when the media is succesfully uploaded."
+          },
+          "400": {
+            "description": "When the parameter does not pass validations or the upload fails."
+          }
+        }
+      }
+    },
+    "/api/management/v1/Media/{id}": {
+      "delete": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Deletes an media from Liveblogging",
+        "description": "This endpoint deletes an media from the available media you can use in your liveblogs,\r\nIt does NOT delete the media from the DAM system.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the media you want to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The id of the media you want to delete",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "No content when the media is succesfully deleted."
+          },
+          "404": {
+            "description": "When the parameter is an invalid / not existing id"
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same media"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Media/images": {
+      "post": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Upload an image on your DAM system.",
+        "description": "This endpoint is deprecated, use the /Media instead\r\nUse these parameters to upload a media on your DAM system:\r\nPublicUrl: the public url of the media to upload\r\nAuthor: should contain the full name of an author and must be a user who logged in the backoffice at least once.\r\nBlogId: the id of the related blog,\r\nName: the name of the media that BackOffice will use\r\nTimeStamp: (optional) should be expressed in ISO8601 format (e.g. 2018-01-05T11:20:00.098Z, 2018-01-05 etc.)\r\nFileName: an optional filename used in cloudinary as publicId. Only digits, lowercase chars, dash and underscore are allowed.",
+        "requestBody": {
+          "description": "The media data.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "text/xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            },
+            "application/*+xml": {
+              "schema": {
+                "$ref": "#/components/schemas/UploadMedia"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "No content when the media is succesfully uploaded."
+          },
+          "400": {
+            "description": "When the parameter does not pass validations or the upload fails."
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/management/v1/Media/images/{id}": {
+      "delete": {
+        "tags": [
+          "Media"
+        ],
+        "summary": "Deletes an image from Liveblogging",
+        "description": "This endpoint is deprecated, use the /Media/{id} instead\r\nThis endpoint deletes an media from the available media you can use in your liveblogs,\r\nIt does NOT delete the media from the DAM system.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the media you want to delete",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The id of the media you want to delete",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          },
+          "204": {
+            "description": "No content when the media is succesfully deleted."
+          },
+          "404": {
+            "description": "When the parameter is an invalid / not existing id"
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same media"
+          }
+        },
+        "deprecated": true
+      }
+    },
+    "/api/management/v1/Posts/{id}": {
+      "get": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Gets a Post",
+        "description": "Use this endpoint to get a post with the corresponding unique identifier (PostId).",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the Post to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The id of the Post to retrieve",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The post has been found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostManagement"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostManagement"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostManagement"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "When I'm providing a not existing PostId"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Updates a post.",
+        "description": "Use this endpoint to update a post.\r\nThe mandatory parameters are a non empty list of post parts, the timestamp, and the author.\r\nEach post part must contain type and content, while the preview is optional.\r\nThe sticky parameter is optional with a default of false.\r\nThe KeyMoment field contains the title of the keymoment and a boolean representing if the KeyMoment should be active or not\r\nIf some of the mandatory parameters are missing, empty or null, or some other parameters do not match their\r\ntype or format, an Unprocessable Entity response will be returned.\r\nThe given post will replace the already existing post, hence the provided post is to be intended as a\r\nsnapshot of the entire updated post.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The id of the post to update.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The id of the post to update.",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "The post data.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostManagement"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostManagement"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostManagement"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostManagement"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Success"
+          },
+          "404": {
+            "description": "When no post with the given id could be found"
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same blog"
+          },
+          "422": {
+            "description": "When the parameter does not match its model"
+          },
+          "204": {
+            "description": "The post has been updated"
+          },
+          "400": {
+            "description": "When there is something wrong with the provided data, e.g. invalid author"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Deletes a Post.",
+        "description": "Deletes the post with the given id",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "The post id.",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "description": "The post id.",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "The post has been deleted"
+          },
+          "408": {
+            "description": "Request Timeout"
+          },
+          "404": {
+            "description": "When the post corresponding to the requested id does not exist"
+          }
+        }
+      }
+    },
+    "/api/management/v1/Posts": {
+      "post": {
+        "tags": [
+          "Posts"
+        ],
+        "summary": "Creates a new Post.",
+        "description": "Use this endpoint to create a new post.\r\nThe mandatory parameters are BlogId, an array called Parts that represents the content of the post and\r\nthe Author of the post.\r\nThe BlogId is the id of the blog that contains the post you are creating.\r\nParts is the content of the post, it is an array with the following fields:\r\n    - Type: a string representing the source of this data (mandatory)\r\n    - Content: a Json definition of the content representing this part (mandatory)\r\n    - Preview: an HTML representation of this content (optional)\r\nThe KeyMoment field contains the title of the keymoment and a boolean representing if the KeyMoment should be active or not\r\nAuthor field contains name and surname of the person who creates the post.\r\nThe author has to be a user who logged into the backoffice at least once.\r\nWhen the author field value does not match a valid user the response will have a 400 status code.\r\nUsing the optional Timestamp parameter you can specify the timestamp of this post.\r\nIf the post should stay on top regardless its timestamp, you can specify the boolean parameters isSticky.\r\nWhen a Post is created the location of the created resource is returned in the Response headers.",
+        "requestBody": {
+          "description": "The post data.",
+          "content": {
+            "application/json-patch+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostManagement"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostManagement"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostManagement"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePostManagement"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "The post has been created"
+          },
+          "404": {
+            "description": "When no post with the given id could be found"
+          },
+          "408": {
+            "description": "The operation cannot be performed due to too many concurrent requests on the same blog"
+          },
+          "422": {
+            "description": "When the parameter does not match its model"
+          },
+          "400": {
+            "description": "When the inserted author is not a valid user."
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ObjectId": {
+        "type": "object",
+        "properties": {
+          "Timestamp": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "Machine": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "Pid": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "Increment": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true,
+            "deprecated": true
+          },
+          "CreationTime": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "Id": {
+            "type": "string",
+            "nullable": true
+          },
+          "TagId": {
+            "type": "string",
+            "nullable": true
+          },
+          "Slug": {
+            "type": "string",
+            "nullable": true
+          },
+          "Label": {
+            "type": "string",
+            "nullable": true
+          },
+          "ExtraData": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LiveBloggingAuthor": {
+        "type": "object",
+        "properties": {
+          "FullName": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Gravity": {
+        "type": "object",
+        "properties": {
+          "X": {
+            "type": "number",
+            "format": "float"
+          },
+          "Y": {
+            "type": "number",
+            "format": "float"
+          },
+          "Width": {
+            "type": "number",
+            "format": "float"
+          },
+          "Height": {
+            "type": "number",
+            "format": "float"
+          }
+        },
+        "additionalProperties": false
+      },
+      "DAMReference": {
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "Path": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "MediaId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Media": {
+        "type": "object",
+        "properties": {
+          "Uri": {
+            "type": "string",
+            "format": "uri",
+            "nullable": true
+          },
+          "Author": {
+            "$ref": "#/components/schemas/LiveBloggingAuthor"
+          },
+          "Version": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "MediaVersion": {
+            "type": "string",
+            "nullable": true
+          },
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Name": {
+            "type": "string",
+            "nullable": true
+          },
+          "Type": {
+            "type": "string",
+            "nullable": true
+          },
+          "TemplateUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "DistributionTemplateUrl": {
+            "type": "string",
+            "nullable": true
+          },
+          "Gravity": {
+            "$ref": "#/components/schemas/Gravity"
+          },
+          "DAMReference": {
+            "$ref": "#/components/schemas/DAMReference"
+          }
+        },
+        "additionalProperties": false
+      },
+      "PaginationType": {
+        "enum": [
+          0,
+          1
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "PostSharing": {
+        "type": "object",
+        "properties": {
+          "Enabled": {
+            "type": "boolean"
+          },
+          "Destinations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "Presentation": {
+        "type": "object",
+        "properties": {
+          "KeyMomentsVisible": {
+            "type": "boolean"
+          },
+          "ShowBlogDefinition": {
+            "type": "boolean"
+          },
+          "PaginationType": {
+            "$ref": "#/components/schemas/PaginationType"
+          },
+          "PostSharing": {
+            "$ref": "#/components/schemas/PostSharing"
+          }
+        },
+        "additionalProperties": false
+      },
+      "Blog": {
+        "required": [
+          "Author",
+          "Language",
+          "Slug",
+          "Title"
+        ],
+        "type": "object",
+        "properties": {
+          "Id": {
+            "$ref": "#/components/schemas/ObjectId"
+          },
+          "Title": {
+            "type": "string"
+          },
+          "Slug": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true
+          },
+          "DateFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "DateTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Language": {
+            "type": "string"
+          },
+          "LastUpdateDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Author": {
+            "$ref": "#/components/schemas/LiveBloggingAuthor"
+          },
+          "LastContributor": {
+            "type": "string",
+            "nullable": true
+          },
+          "TimeZone": {
+            "type": "string",
+            "nullable": true
+          },
+          "CoverImage": {
+            "$ref": "#/components/schemas/Media"
+          },
+          "Presentation": {
+            "$ref": "#/components/schemas/Presentation"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreateBlog": {
+        "required": [
+          "Author",
+          "Language",
+          "Slug",
+          "Title"
+        ],
+        "type": "object",
+        "properties": {
+          "Title": {
+            "type": "string"
+          },
+          "Slug": {
+            "type": "string"
+          },
+          "Description": {
+            "type": "string",
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true
+          },
+          "Language": {
+            "type": "string"
+          },
+          "DateFrom": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "DateTo": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Author": {
+            "type": "string"
+          },
+          "CoverImage": {
+            "$ref": "#/components/schemas/Media"
+          },
+          "TimeZone": {
+            "type": "string",
+            "nullable": true
+          },
+          "Presentation": {
+            "$ref": "#/components/schemas/Presentation"
+          }
+        },
+        "additionalProperties": false
+      },
+      "ExternalSource": {
+        "type": "object",
+        "properties": {
+          "ExternalSourceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "ExternalSourceId": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostPartManagement": {
+        "required": [
+          "Content",
+          "Type"
+        ],
+        "type": "object",
+        "properties": {
+          "Type": {
+            "type": "string"
+          },
+          "Content": {
+            "type": "object",
+            "additionalProperties": { }
+          },
+          "Preview": {
+            "type": "string",
+            "nullable": true
+          },
+          "ExternalSourceReference": {
+            "$ref": "#/components/schemas/ExternalSource"
+          },
+          "Properties": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "KeyMoment": {
+        "type": "object",
+        "properties": {
+          "IsEnabled": {
+            "type": "boolean"
+          },
+          "Title": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "PostManagement": {
+        "type": "object",
+        "properties": {
+          "PostId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "Parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostPartManagement"
+            },
+            "nullable": true
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true
+          },
+          "KeyMoment": {
+            "$ref": "#/components/schemas/KeyMoment"
+          },
+          "IsSticky": {
+            "type": "boolean"
+          },
+          "Author": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "ConfigurationKey": {
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13
+        ],
+        "type": "integer",
+        "format": "int32"
+      },
+      "ConfigurationManagement": {
+        "required": [
+          "Key",
+          "Values"
+        ],
+        "type": "object",
+        "properties": {
+          "Key": {
+            "$ref": "#/components/schemas/ConfigurationKey"
+          },
+          "Values": { }
+        },
+        "additionalProperties": false
+      },
+      "UploadMedia": {
+        "required": [
+          "Author",
+          "BlogId",
+          "Name",
+          "PublicUrl"
+        ],
+        "type": "object",
+        "properties": {
+          "PublicUrl": {
+            "type": "string"
+          },
+          "Author": {
+            "type": "string"
+          },
+          "BlogId": {
+            "type": "string"
+          },
+          "Name": {
+            "type": "string"
+          },
+          "TimeStamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "FileName": {
+            "pattern": "[-0-9a-z_]*",
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "UpdatePostManagement": {
+        "required": [
+          "Author",
+          "Parts",
+          "Timestamp"
+        ],
+        "type": "object",
+        "properties": {
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "Parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostPartManagement"
+            }
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true
+          },
+          "KeyMoment": {
+            "$ref": "#/components/schemas/KeyMoment"
+          },
+          "Properties": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
+          },
+          "IsSticky": {
+            "type": "boolean"
+          },
+          "Author": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": false
+      },
+      "CreatePostManagement": {
+        "required": [
+          "Author",
+          "BlogId"
+        ],
+        "type": "object",
+        "properties": {
+          "BlogId": {
+            "type": "string"
+          },
+          "Parts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostPartManagement"
+            },
+            "nullable": true
+          },
+          "Timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "IsSticky": {
+            "type": "boolean"
+          },
+          "Tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            },
+            "nullable": true
+          },
+          "KeyMoment": {
+            "$ref": "#/components/schemas/KeyMoment"
+          },
+          "Properties": {
+            "type": "object",
+            "additionalProperties": { },
+            "nullable": true
+          },
+          "Author": {
+            "type": "string",
+            "description": "Name and Surname of the Author of the post.\r\nAn author is a user who already logged in previously."
+          }
+        },
+        "additionalProperties": false
+      }
+    },
+    "securitySchemes": {
+      "Secret": {
+        "type": "apiKey",
+        "description": "Shared secret authorization key with schema. e.g. LiveBlogging key=secret",
+        "name": "Authorization",
+        "in": "header"
+      }
+    }
+  },
+  "security": [
+    {
+      "Secret": [ ]
+    }
+  ]
+}
